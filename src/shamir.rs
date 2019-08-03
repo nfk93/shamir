@@ -7,8 +7,7 @@ pub struct Secret<F: Field>(F);
 impl<F: Field> Secret<F> {
 
     pub fn generate_shares<R: Rng>(&self, k: u32, n: u32, rng: &mut R) -> Vec<SecretShare<F>> {
-        let coefficients: Vec<F> = get_coefficients(k-1, rng);
-
+        let coefficients: Vec<F> = (0..k-1).map(|_| F::rand(rng)).collect();
         (0..n).map(|i| {
             let mut result = self.0.clone();
             let x = F::one().mul_by_scalar(i+1);
@@ -48,21 +47,6 @@ pub fn reveal_secret<F: Field>(shares: Vec<SecretShare<F>>) -> Secret<F> {
     Secret(sum)
 }
 
-fn get_coefficients<F: Field, R: Rng>(amount: u32, rng: &mut R) -> Vec<F> {
-    let mut coefficients: Vec<F> = Vec::new();
-    for _ in 0..amount {
-        let mut opt = None;
-        while opt.is_none() {
-            let coeff = F::rand(rng);
-            if !coefficients.contains(&coeff) {
-                opt = Some(coeff);
-            }
-        }
-        coefficients.push(opt.unwrap());
-    }
-    coefficients
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,7 +55,7 @@ mod tests {
 
     #[test]
     fn test_share_and_reveal() {
-        for _ in 0..100 {
+        for _ in 0..1000 {
             let mut rng = thread_rng();
             let secret = G1613::new(1182);
             let secret = Secret(secret);
