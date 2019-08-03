@@ -65,8 +65,8 @@ mod tests {
             assert_eq!(revealed.0, secret.0);
             let revealed = reveal_secret(shares[5..10].to_vec());
             assert_eq!(revealed.0, secret.0);
-            let fail_reveal = reveal_secret(shares[2..6].to_vec());
-            assert_ne!(fail_reveal.0, secret.0)
+            let revealed = reveal_secret(shares[1..8].to_vec());
+            assert_eq!(revealed.0, secret.0)
         }
     }
 }
